@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List
+import os
 
 class Component(ABC):
     """
@@ -42,7 +43,9 @@ class Documento(Component):
 
     def operation(self) -> str:
         return f"Documento({self.nombre}, {self.tipo})"
-
+    def guardar(self, path):
+        with open(os.path.join(path, self.nombre + '.' + self.tipo), 'w') as file:
+            file.write(self.contenido)
 class Enlace(Component):
     """
     Clase Enlace representa un enlace a otro componente del sistema.
@@ -59,7 +62,8 @@ class Carpeta(Component):
     Clase Carpeta representa una colección de Componentes.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, nombre) -> None:
+        self.nombre = nombre
         self._children: List[Component] = []
 
     def add(self, component: Component) -> None:
@@ -110,26 +114,68 @@ class ProxyDocumento(Documento):
 
     def log_access(self) -> None:
         print(f"ProxyDocumento: Registrando acceso a {self.nombre}.", end="")
+class GestorDocumental:
+    """
+    GestorDocumental actúa como el punto central para gestionar documentos, enlaces y carpetas.
+    """
 
+    def __init__(self):
+        self.raiz = Carpeta('raiz')
+
+    def añadir_componente(self, componente: Component, carpeta: Carpeta = None):
+        if carpeta is None:
+            carpeta = self.raiz
+        carpeta.add(componente)
+
+    def eliminar_componente(self, componente: Component, carpeta: Carpeta = None):
+        if carpeta is None:
+            carpeta = self.raiz
+        carpeta.remove(componente)
+
+    def mostrar_estructura(self, componente: Component = None):
+        if componente is None:
+            componente = self.raiz
+        print(componente.operation())
+    def guardar_todos(self, path):
+        for child in self.raiz._children:
+            if isinstance(child, Documento):
+                child.guardar(path)
+            elif isinstance(child, Carpeta):
+                new_path = os.path.join(path, child.nombre)
+                os.makedirs(new_path, exist_ok=True)
+                self._guardar_carpeta(child, new_path)
+
+    def _guardar_carpeta(self, carpeta, path):
+        for child in carpeta._children:
+            if isinstance(child, Documento):
+                child.guardar(path)
+            elif isinstance(child, Carpeta):
+                new_path = os.path.join(path, child.nombre)
+                os.makedirs(new_path, exist_ok=True)
+                self._guardar_carpeta(child, new_path)
 
 if __name__ == "__main__":
-    # Uso de la clase Documento
+    gestor = GestorDocumental()
+
+    # Crear documentos y carpetas
     documento_simple = Documento("Informe", "txt", 1024, "Contenido del informe")
-    print("Cliente: Tengo un documento simple:")
-    client_code(documento_simple)
-    print("\n")
+    documento_secreto = ProxyDocumento(Documento("InformeSecreto", "pdf", 2048, "Contenido confidencial"))
+    carpeta_personal = Carpeta("Personal")
 
-    # Uso de la clase Carpeta
-    carpeta = Carpeta()
-    carpeta.add(documento_simple)
-    carpeta.add(Enlace(documento_simple))
+    # Añadir documentos y carpetas al gestor
+    gestor.añadir_componente(documento_simple)
+    gestor.añadir_componente(documento_secreto, carpeta_personal)
+    gestor.añadir_componente(carpeta_personal)
 
-    print("Cliente: Ahora tengo una carpeta:")
-    client_code(carpeta)
-    print("\n")
+    # Mostrar la estructura del gestor documental
+    print("Estructura del Gestor Documental:")
+    gestor.mostrar_estructura()
+
+    # Acceder a un documento a través del proxy
+    print("\nAcceso al Documento Secreto a través del Proxy:")
+    documento_secreto.request()
+    #guardar todos los documentos en una carpeta
     
-    documento_real = Documento("InformeSecreto", "pdf", 2048, "Contenido confidencial")
-    proxy_documento = ProxyDocumento(documento_real)
-
-    print("Cliente: Accediendo al documento a través del proxy:")
-    proxy_documento.request()
+    gestor.guardar_todos('ejercicio2')
+    
+    
