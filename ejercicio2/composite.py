@@ -46,6 +46,7 @@ class Documento(Component):
     def guardar(self, path):
         with open(os.path.join(path, self.nombre + '.' + self.tipo), 'w') as file:
             file.write(self.contenido)
+            
 class Enlace(Component):
     """
     Clase Enlace representa un enlace a otro componente del sistema.
@@ -158,7 +159,7 @@ if __name__ == "__main__":
     gestor = GestorDocumental()
 
     # Crear documentos y carpetas
-    documento_simple = Documento("Informe", "txt", 1024, "Contenido del informe")
+    documento_simple = Documento("Informe", "txt", 1024, "Contenido del informeeeee")
     documento_secreto = ProxyDocumento(Documento("InformeSecreto", "pdf", 2048, "Contenido confidencial"))
     carpeta_personal = Carpeta("Personal")
 
