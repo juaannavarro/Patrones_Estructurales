@@ -86,6 +86,31 @@ def client_code2(component1: Component, component2: Component) -> None:
     if component1.is_composite():
         component1.add(component2)
     print(f"RESULTADO: {component1.operation()}", end="")
+class ProxyDocumento(Documento):
+    """
+    ProxyDocumento actúa como intermediario para la clase Documento.
+    Controla el acceso y puede añadir funcionalidades adicionales como
+    registro de acceso y verificación de permisos.
+    """
+
+    def __init__(self, documento_real: Documento) -> None:
+        super().__init__(documento_real.nombre, documento_real.tipo, 
+                         documento_real.tamaño, documento_real.contenido)
+        self._documento_real = documento_real
+
+    def request(self) -> None:
+        if self.check_access():
+            self._documento_real.operation()
+            self.log_access()
+
+    def check_access(self) -> bool:
+        print(f"ProxyDocumento: Verificando acceso para {self.nombre}.")
+        # Aquí iría la lógica para verificar permisos
+        return True
+
+    def log_access(self) -> None:
+        print(f"ProxyDocumento: Registrando acceso a {self.nombre}.", end="")
+
 
 if __name__ == "__main__":
     # Uso de la clase Documento
@@ -102,4 +127,9 @@ if __name__ == "__main__":
     print("Cliente: Ahora tengo una carpeta:")
     client_code(carpeta)
     print("\n")
+    
+    documento_real = Documento("InformeSecreto", "pdf", 2048, "Contenido confidencial")
+    proxy_documento = ProxyDocumento(documento_real)
 
+    print("Cliente: Accediendo al documento a través del proxy:")
+    proxy_documento.request()
