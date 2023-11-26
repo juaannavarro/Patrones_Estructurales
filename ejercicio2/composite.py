@@ -2,7 +2,49 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List
 import os
+import random
+import string
 
+
+def generar_nombre_aleatorio(longitud):
+    letras = string.ascii_letters
+    return ''.join(random.choice(letras) for i in range(longitud))
+
+def generar_tipo_aleatorio():
+    tipos = ['txt', 'pdf', 'doc', 'jpg']
+    return random.choice(tipos)
+
+def generar_contenido_aleatorio(palabras=50):
+    palabras = [generar_nombre_aleatorio(random.randint(4, 10)) for _ in range(palabras)]
+    return ' '.join(palabras)
+
+def menu_principal(gestor):
+    while True:
+        print("\nGestor Documental")
+        print("1. Crear documento aleatorio")
+        print("2. Crear carpeta")
+        print("3. Mostrar estructura")
+        print("4. Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == '1':
+            nombre = generar_nombre_aleatorio(10)
+            tipo = generar_tipo_aleatorio()
+            contenido = generar_contenido_aleatorio()
+            documento = Documento(nombre, tipo, len(contenido), contenido)
+            gestor.añadir_componente(documento)
+            print(f"Documento {nombre}.{tipo} creado.")
+        elif opcion == '2':
+            nombre_carpeta = input("Ingrese el nombre de la carpeta: ")
+            carpeta = Carpeta(nombre_carpeta)
+            gestor.añadir_componente(carpeta)
+            print(f"Carpeta '{nombre_carpeta}' creada.")
+        elif opcion == '3':
+            gestor.mostrar_estructura()
+        elif opcion == '4':
+            break
+        else:
+            print("Opción no válida, intente nuevamente.")
 class Component(ABC):
     """
     La clase base Component declara operaciones comunes tanto para objetos
@@ -157,7 +199,7 @@ class GestorDocumental:
 
 if __name__ == "__main__":
     gestor = GestorDocumental()
-
+    menu_principal(gestor)
     # Crear documentos y carpetas
     documento_simple = Documento("Informe", "txt", 1024, "Contenido del informeeeee")
     documento_secreto = ProxyDocumento(Documento("InformeSecreto", "pdf", 2048, "Contenido confidencial"))
