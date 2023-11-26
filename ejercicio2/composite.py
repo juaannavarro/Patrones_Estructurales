@@ -51,6 +51,10 @@ class Documento(Component):
         with open(os.path.join(path, self.nombre + '.' + self.tipo), 'w') as file:
             file.write(self.contenido)
             
+    def modificar_contenido(self, nuevo_contenido):
+        self.contenido = nuevo_contenido
+        self.tamaño = len(nuevo_contenido)
+        self.guardar(os.path.dirname(os.path.abspath(__file__)))
 class Enlace(Component):
     """
     Clase Enlace representa un enlace a otro componente del sistema.
@@ -167,7 +171,63 @@ class GestorDocumental:
                 new_path = os.path.join(path, child.nombre)
                 os.makedirs(new_path, exist_ok=True)
                 self._guardar_carpeta(child, new_path)
-                
+    def modificar_documento(self, nombre_documento, nuevo_contenido, carpeta: Carpeta = None):
+        carpeta_destino = carpeta if carpeta is not None else self.raiz
+        documento_a_modificar = self._buscar_documento(carpeta_destino, nombre_documento)
+        if documento_a_modificar:
+            documento_a_modificar.modificar_contenido(nuevo_contenido)
+            print(f"Documento '{nombre_documento}' modificado.")
+        else:
+            print(f"No se encontró el documento: {nombre_documento}")
+
+    def _buscar_documento(self, carpeta, nombre_documento):
+        for componente in carpeta._children:
+            if isinstance(componente, Documento) and componente.nombre == nombre_documento:
+                return componente
+            elif isinstance(componente, Carpeta):
+                resultado = self._buscar_documento(componente, nombre_documento)
+                if resultado:
+                    return resultado
+        return None
+    
+
+    def eliminar_componente(self, nombre_componente, carpeta: Carpeta = None):
+        carpeta_destino = carpeta if carpeta is not None else self.raiz
+        componente_a_eliminar = self._buscar_componente(carpeta_destino, nombre_componente)
+        if componente_a_eliminar:
+            carpeta_destino.remove(componente_a_eliminar)
+            if isinstance(componente_a_eliminar, Documento):
+                self._eliminar_archivo(componente_a_eliminar)
+            elif isinstance(componente_a_eliminar, Carpeta):
+                self._eliminar_carpeta_recursivamente(componente_a_eliminar, os.path.join(os.path.dirname(os.path.abspath(__file__)), componente_a_eliminar.nombre))
+            print(f"Componente '{nombre_componente}' eliminado.")
+        else:
+            print(f"No se encontró el componente: {nombre_componente}")
+
+    def _eliminar_carpeta_recursivamente(self, carpeta, ruta_carpeta):
+        for hijo in carpeta._children:
+            if isinstance(hijo, Documento):
+                self._eliminar_archivo(hijo)
+            elif isinstance(hijo, Carpeta):
+                sub_ruta_carpeta = os.path.join(ruta_carpeta, hijo.nombre)
+                self._eliminar_carpeta_recursivamente(hijo, sub_ruta_carpeta)
+        if os.path.isdir(ruta_carpeta):
+            os.rmdir(ruta_carpeta)
+
+    def _eliminar_archivo(self, documento: Documento):
+        ruta_archivo = os.path.join(os.path.dirname(os.path.abspath(__file__)), documento.nombre + '.' + documento.tipo)
+        if os.path.isfile(ruta_archivo):
+            os.remove(ruta_archivo)
+
+    def _buscar_componente(self, carpeta, nombre_componente):
+        for componente in carpeta._children:
+            if (isinstance(componente, Documento) or isinstance(componente, Carpeta)) and componente.nombre == nombre_componente:
+                return componente
+            elif isinstance(componente, Carpeta):
+                resultado = self._buscar_componente(componente, nombre_componente)
+                if resultado:
+                    return resultado
+        return None         
 def generar_nombre_aleatorio(longitud):
     letras = string.ascii_letters
     return ''.join(random.choice(letras) for i in range(longitud))
@@ -194,6 +254,8 @@ def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
         print("5. Mostrar estructura")
         print(f"6. Cambiar usuario (actualmente: {'Admin' if usuario_actual.es_admin else 'User'})")
         print("7. Salir")
+        print("8. Modificar documento")
+        print("9. Eliminar documento o carpeta")
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
@@ -238,7 +300,15 @@ def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
             usuario_actual.es_admin = not usuario_actual.es_admin
             print("Cambiado a usuario administrador." if usuario_actual.es_admin else "Cambiado a usuario normal.")
         elif opcion == '7':
-            break            
+            break       
+        elif opcion == '8':
+            nombre_documento = input("Ingrese el nombre del documento a modificar: ")
+            nuevo_contenido = input("Ingrese el nuevo contenido del documento: ")
+            gestor.modificar_documento(nombre_documento, nuevo_contenido)
+
+        elif opcion == '9':
+            nombre_componente = input("Ingrese el nombre del documento o carpeta a eliminar: ")
+            gestor.eliminar_componente(nombre_componente)    
         else:
             print("Opción no válida, intente nuevamente.")
 
