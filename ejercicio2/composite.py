@@ -263,7 +263,9 @@ def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
             tipo = generar_tipo_aleatorio()
             contenido = generar_contenido_aleatorio()
             documento = Documento(nombre, tipo, len(contenido), contenido)
-            gestor.añadir_componente(documento)
+            carpeta_global = Carpeta("Global")
+            gestor.añadir_componente(documento, carpeta_global)
+            gestor.añadir_componente(carpeta_global)
             print(f"Documento {nombre}.{tipo} creado.")           
         elif opcion == '2' and usuario_actual.es_admin:
             nombre = generar_nombre_aleatorio(10)
@@ -287,7 +289,9 @@ def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
                 gestor.añadir_componente(carpeta_personal)
             else:               
                 Documento_simple = Documento(nombre, tipo, tamaño, contenido)
-                gestor.añadir_componente(Documento_simple)
+            carpeta_global = Carpeta("Global")
+            gestor.añadir_componente(Documento_simple, carpeta_global)
+            gestor.añadir_componente(carpeta_global)
             print(f"Documento {nombre}.{tipo} creado.")
         elif opcion == '4':
             nombre_carpeta = input("Ingrese el nombre de la carpeta: ")
@@ -315,9 +319,6 @@ def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
         gestor.guardar_todos('ejercicio2')
 
     
-if __name__ == "__main__":
-    gestor = GestorDocumental()
-    menu_principal(gestor)
 
     
     
