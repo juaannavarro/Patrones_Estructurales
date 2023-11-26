@@ -1,0 +1,70 @@
+'@startuml nombre'
+
+class Component {
+  #_parent: Component
+  {abstract} +operation(): str
+  +add(component: Component): void
+  +remove(component: Component): void
+  +is_composite(): bool
+}
+
+class Documento {
+  -nombre: String
+  -tipo: String
+  -tamaño: int
+  -contenido: String
+  +operation(): str
+  +guardar(path: String): void
+  +modificar_contenido(nuevo_contenido: String): void
+}
+
+class Enlace {
+  -referencia: Component
+  +operation(): str
+}
+
+class Carpeta {
+  -nombre: String
+  -_children: List<Component>
+  +add(component: Component): void
+  +remove(component: Component): void
+  +is_composite(): bool
+  +operation(): str
+}
+
+class Usuario {
+  -nombre: String
+  -es_admin: bool
+}
+
+class ProxyDocumento {
+  -_documento_real: Documento
+  +request(usuario: Usuario): void
+  +check_access(usuario: Usuario): bool
+  +log_access(usuario: Usuario): void
+}
+
+class GestorDocumental {
+  -raiz: Carpeta
+  +añadir_componente(componente: Component, carpeta: Carpeta): void
+  +eliminar_componente(componente: Component, carpeta: Carpeta): void
+  +mostrar_estructura(componente: Component): void
+  +guardar_todos(path: String): void
+  +_guardar_carpeta(carpeta: Carpeta, path: String): void
+  +modificar_documento(nombre_documento: String, nuevo_contenido: String, carpeta: Carpeta): void
+  +_buscar_documento(carpeta: Carpeta, nombre_documento: String): Documento
+  +_eliminar_carpeta_recursivamente(carpeta: Carpeta, ruta_carpeta: String): void
+  +_eliminar_archivo(documento: Documento): void
+  +_buscar_componente(carpeta: Carpeta, nombre_componente: String): Component
+}
+
+Component <|-- Documento
+Component <|-- Enlace
+Component <|-- Carpeta
+Documento <|-- ProxyDocumento
+
+Carpeta "1" *-- "many" Component : contains
+ProxyDocumento "1" *-- "1" Documento : proxy of
+GestorDocumental "1" *-- "1" Carpeta : has
+
+@enduml
