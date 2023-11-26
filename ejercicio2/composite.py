@@ -95,6 +95,13 @@ def client_code2(component1: Component, component2: Component) -> None:
     if component1.is_composite():
         component1.add(component2)
     print(f"RESULTADO: {component1.operation()}", end="")
+    
+class Usuario:
+    def __init__(self, nombre, es_admin):
+        self.nombre = nombre
+        self.es_admin = es_admin  # True para administradores, False para usuarios normales
+
+
 class ProxyDocumento(Documento):
     """
     ProxyDocumento actúa como intermediario para la clase Documento.
@@ -106,19 +113,21 @@ class ProxyDocumento(Documento):
         super().__init__(documento_real.nombre, documento_real.tipo, 
                          documento_real.tamaño, documento_real.contenido)
         self._documento_real = documento_real
-
-    def request(self) -> None:
-        if self.check_access():
+    def request(self, usuario: Usuario) -> None:
+        if self.check_access(usuario) and usuario.es_admin:
             self._documento_real.operation()
-            self.log_access()
+            self.log_access(usuario)
+        else:
+            print(f"Acceso denegado para el usuario: {usuario.nombre}")
 
-    def check_access(self) -> bool:
-        print(f"ProxyDocumento: Verificando acceso para {self.nombre}.")
-        # Aquí iría la lógica para verificar permisos
-        return True
+    def check_access(self, usuario: Usuario) -> bool:
+        return usuario.es_admin  # Solo permitir acceso si el usuario es administrador
 
-    def log_access(self) -> None:
-        print(f"ProxyDocumento: Registrando acceso a {self.nombre}.", end="")
+    def log_access(self, usuario: Usuario) -> None:
+        print(f"Acceso registrado: {usuario.nombre} accedió a {self.nombre}")
+
+
+
 class GestorDocumental:
     """
     GestorDocumental actúa como el punto central para gestionar documentos, enlaces y carpetas.
@@ -171,16 +180,20 @@ def generar_contenido_aleatorio(palabras=50):
     palabras = [generar_nombre_aleatorio(random.randint(4, 10)) for _ in range(palabras)]
     return ' '.join(palabras)
 
-def menu_principal(gestor):
+def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
 
+    gestor= GestorDocumental()
+    
     while True:
         print("\nGestor Documental")
         print("1. Crear documento aleatorio")
-        print("2. Crear documento secreto aleatorio")
+        if usuario_actual.es_admin:
+            print("2. Crear documento secreto aleatorio")
         print("3. Crear documento")
         print("4. Crear carpeta")
         print("5. Mostrar estructura")
-        print("6. Salir")
+        print(f"6. Cambiar usuario (actualmente: {'Admin' if usuario_actual.es_admin else 'User'})")
+        print("7. Salir")
         opcion = input("Seleccione una opción: ")
 
         if opcion == '1':
@@ -190,13 +203,15 @@ def menu_principal(gestor):
             documento = Documento(nombre, tipo, len(contenido), contenido)
             gestor.añadir_componente(documento)
             print(f"Documento {nombre}.{tipo} creado.")           
-        elif opcion == '2':
+        elif opcion == '2' and usuario_actual.es_admin:
             nombre = generar_nombre_aleatorio(10)
             tipo = generar_tipo_aleatorio()
             contenido = generar_contenido_aleatorio()
             documento = ProxyDocumento(Documento(nombre, tipo, len(contenido), contenido))
-            gestor.añadir_componente(documento)
-            print(f"Documento {nombre}.{tipo} creado.")           
+            carpeta_personal = Carpeta("Personal")
+            gestor.añadir_componente(documento, carpeta_personal)
+            gestor.añadir_componente(carpeta_personal)
+            print(f"Documento secreto {nombre}.{tipo} creado.")           
         elif opcion == '3':           
             nombre = input("Ingrese el nombre del documento: ")
             tipo = input("Ingrese el tipo del documento: ")
@@ -207,6 +222,7 @@ def menu_principal(gestor):
                 Documento_secreto = ProxyDocumento(Documento(nombre, tipo, tamaño, contenido))
                 carpeta_personal = Carpeta("Personal")
                 gestor.añadir_componente(Documento_secreto, carpeta_personal)
+                gestor.añadir_componente(carpeta_personal)
             else:               
                 Documento_simple = Documento(nombre, tipo, tamaño, contenido)
                 gestor.añadir_componente(Documento_simple)
@@ -219,33 +235,19 @@ def menu_principal(gestor):
         elif opcion == '5':
             gestor.mostrar_estructura()
         elif opcion == '6':
-            break
+            usuario_actual.es_admin = not usuario_actual.es_admin
+            print("Cambiado a usuario administrador." if usuario_actual.es_admin else "Cambiado a usuario normal.")
+        elif opcion == '7':
+            break            
         else:
             print("Opción no válida, intente nuevamente.")
 
-if __name__ == "__main__":
-    gestor = GestorDocumental()
+        gestor.guardar_todos('ejercicio2')
 
     
-    # Crear documentos y carpetas
-    documento_simple = Documento("Informe", "txt", 1024, "Contenido del informeeeee")
-    documento_secreto = ProxyDocumento(Documento("InformeSecreto", "pdf", 2048, "Contenido Confidencial"))
-    carpeta_personal = Carpeta("Personal")
+if __name__ == "__main__":
+    gestor = GestorDocumental()
+    menu_principal(gestor)
 
-    # Añadir documentos y carpetas al gestor
-    gestor.añadir_componente(documento_simple)
-    gestor.añadir_componente(documento_secreto, carpeta_personal)
-    gestor.añadir_componente(carpeta_personal)
-
-    # Mostrar la estructura del gestor documental
-    print("Estructura del Gestor Documental:")
-    gestor.mostrar_estructura()
-
-    # Acceder a un documento a través del proxy
-    print("\nAcceso al Documento Secreto a través del Proxy:")
-    documento_secreto.request()
-    #guardar todos los documentos en una carpeta
-    menu_principal(gestor)   
-    gestor.guardar_todos('ejercicio2')
     
     
