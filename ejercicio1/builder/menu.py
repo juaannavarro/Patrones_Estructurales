@@ -1,11 +1,11 @@
 import os
 import csv
-from jamonyqueso import jamonyqueso, Constructorjamonyqueso
-from cuatroquesos import cuatroQuesos, ConstructorcuatroQuesos
+from pizzas.jamonyqueso import jamonyqueso, Constructorjamonyqueso
+from pizzas.cuatroquesos import cuatroQuesos, ConstructorcuatroQuesos
 from director import Director
-from personalizada import Personalizada, ConstructorPersonalizada
+from pizzas.personalizada import Personalizada, ConstructorPersonalizada
 from pizzeria import Pizzeria
-from barbacoa import Barbacoa, ConstructorBarbacoa
+from pizzas.barbacoa import Barbacoa, ConstructorBarbacoa
 from usuario import UsuarioBuilder, UsuarioDirector
 import collections
 

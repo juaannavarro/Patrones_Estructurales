@@ -4,7 +4,6 @@ class MenuComponent(ABC):
     @abstractmethod
     def show(self) -> str:
         pass
-
 class MenuItem(MenuComponent):
     def __init__(self, name, price):
         self.name = name
@@ -12,8 +11,6 @@ class MenuItem(MenuComponent):
 
     def show(self) -> str:
         return f"{self.name} - {self.price}€"
-
-
 class MenuCategory(MenuComponent):
     def __init__(self, name):
         self.name = name
@@ -30,7 +27,6 @@ class MenuCategory(MenuComponent):
         for child in self.children:
             result += f"  {child.show()}\n"
         return result
-
 # Creando elementos del menú
 entrante = MenuItem("Pan de Ajo", 3.50)
 bebida = MenuItem("Coca-Cola", 2.00)
