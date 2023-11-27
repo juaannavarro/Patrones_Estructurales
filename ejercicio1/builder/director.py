@@ -50,7 +50,14 @@ class Director:
         self.builder.maridaje(maridaje)
         self.builder.extras(extras)
 
-
+    def build_infantil(self, masa: str, coccion: str, presentacion: str, maridaje: str, extras: List[str]) -> None:
+        self.builder.masa(masa)
+        self.builder.salsa_base()
+        self.builder.ingredientes()
+        self.builder.coccion(coccion)
+        self.builder.presentacion(presentacion)
+        self.builder.maridaje(maridaje)
+        self.builder.extras(extras)
     
 
 
