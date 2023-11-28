@@ -5,10 +5,8 @@ from pizzas.barbacoa import ConstructorBarbacoa, Barbacoa
 from pizzas.cuatroquesos import ConstructorcuatroQuesos, cuatroQuesos
 from pizzas.personalizada import ConstructorPersonalizada, Personalizada
 from composite import *
-
-
-
-
+import csv
+from datetime import datetime
 class Combo:
     def __init__(self):
         self.combo_selected = []
@@ -16,11 +14,17 @@ class Combo:
         self.director = Director()
 
     def start(self):
-        self.elegir_combo()
-        for item in self.combo_selected:
-            print(item)
-        print(f'El precio total es: {self.total_price}€')
+        descuento = self.elegir_combo()
+        precio_total_sin_descuento = self.total_price
+        print(f'Precio total antes del descuento: {precio_total_sin_descuento:.2f}€')
 
+        # Aplicar descuento
+        self.total_price *= (1 - descuento)
+        print(f"Descuento aplicado: {descuento * 100:.0f}%")
+        print(f'Precio final después del descuento: {self.total_price:.2f}€')
+
+        # Guardar en CSV
+        self.guardar_pedido_en_csv(precio_total_sin_descuento, descuento)
     def elegir_combo(self):
         print("Elige un combo: ")
         print("1. Combo infantil")
@@ -32,15 +36,15 @@ class Combo:
         if opcion == "1":
             self.combo_selected.append("Combo infantil")
             self.agregar_items_combo(1, 1, 1, 0)
-            descuento = 0.05 
+            return 0.05 
         elif opcion == "2":
             self.combo_selected.append("Combo familiar")
             self.agregar_items_combo(4, 4, 4, 2)
-            descuento = 0.2
+            return 0.2
         elif opcion == "3":
             self.combo_selected.append("Combo pareja")
             self.agregar_items_combo(2, 2, 2, 1)
-            descuento = 0.1
+            return 0.1
         elif opcion == "4":
             self.combo_selected.append("Sin combo")
             print("Elija los items que desee: ")
@@ -66,13 +70,10 @@ class Combo:
                 print("Elija el número de entrantes que desee: ")
                 num_entrantes = input("Opcion: ")
                 self.agregar_items_combo(0, 0, 0, int(num_entrantes))
+            return 0
         else:
             print("Opción no válida")
-            return
-        print(f'Precio total antes del descuento: {self.total_price:.2f}€')
-        self.total_price *= (1 - descuento)
-        print(f"Descuento aplicado: {descuento * 100}%")
-        print(f'Precio final después del descuento: {self.total_price:.2f}€')
+            return 0
         
     def agregar_items_combo(self, num_pizzas, num_bebidas, num_postres, num_entrantes):
         for _ in range(num_pizzas):
@@ -245,7 +246,7 @@ class Combo:
             precio_extras = 0
 
             for opcion in extras_opcion.split(','):
-                opcion = opcion.strip()  # Eliminar espacios en blanco
+                opcion = opcion.strip() 
                 if opcion.isdigit():
                     opcion = int(opcion) - 1
                     if 0 <= opcion < len(extras.children):
@@ -253,7 +254,6 @@ class Combo:
                         extras_seleccionados.append(extra_seleccionado.name)
                         precio_extras += extra_seleccionado.get_price()
 
-            # Construir la pizza con los extras seleccionados
             director.build_barbacoa(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)
 
             descripcion_pizza = builder.product.list_parts()
@@ -388,7 +388,26 @@ class Combo:
                 print("Opción no válida")
         else:
             print("Por favor, ingrese un número válido")
+    def guardar_pedido_en_csv(self, precio_sin_descuento, descuento):
+        # Asumiendo que self.combo_selected es una lista de strings que representan los ítems seleccionados
+        fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        datos_pedido = {
+            'fecha': fecha,
+            'items': ', '.join(self.combo_selected),
+            'precio_sin_descuento': precio_sin_descuento,
+            'descuento': f"{descuento * 100}%",
+            'precio_final': self.total_price
+        }
 
+        with open('pedidos.csv', 'a', newline='') as archivo_csv:
+            escritor_csv = csv.DictWriter(archivo_csv, fieldnames=datos_pedido.keys())
+            
+            # Escribir la cabecera solo si el archivo está vacío (posiblemente sea la primera escritura)
+            archivo_csv.seek(0, 2)  # Moverse al final del archivo
+            if archivo_csv.tell() == 0:  # Verificar si el archivo está vacío
+                escritor_csv.writeheader()  # Escribir la cabecera
+
+            escritor_csv.writerow(datos_pedido)
 
 combo = Combo()
 combo.start()

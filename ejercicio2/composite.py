@@ -7,7 +7,6 @@ import string
 
 import unittest
 
-# Aquí va la definición de tus clases (Component, Documento, etc.)
 
 class TestDocumento(unittest.TestCase):
 
@@ -108,10 +107,7 @@ class TestDocumento(unittest.TestCase):
         self.assertEqual(gestor.raiz._children, [])
         
 class Component(ABC):
-    """
-    La clase base Component declara operaciones comunes tanto para objetos
-    simples como para objetos complejos de una composición.
-    """
+
 
     @property
     def parent(self) -> Component:
@@ -135,9 +131,7 @@ class Component(ABC):
         pass
 
 class Documento(Component):
-    """
-    Clase Documento representa documentos individuales en el sistema.
-    """
+
 
     def __init__(self, nombre, tipo, tamaño, contenido):
         self.nombre = nombre
@@ -156,9 +150,7 @@ class Documento(Component):
         self.tamaño = len(nuevo_contenido)
         self.guardar(os.path.dirname(os.path.abspath(__file__)))
 class Enlace(Component):
-    """
-    Clase Enlace representa un enlace a otro componente del sistema.
-    """
+
 
     def __init__(self, referencia):
         self.referencia = referencia
@@ -167,9 +159,7 @@ class Enlace(Component):
         return f"Enlace({self.referencia.operation()})"
 
 class Carpeta(Component):
-    """
-    Clase Carpeta representa una colección de Componentes.
-    """
+
 
     def __init__(self, nombre) -> None:
         self.nombre = nombre
@@ -207,11 +197,6 @@ class Usuario:
 
 
 class ProxyDocumento(Documento):
-    """
-    ProxyDocumento actúa como intermediario para la clase Documento.
-    Controla el acceso y puede añadir funcionalidades adicionales como
-    registro de acceso y verificación de permisos.
-    """
 
     def __init__(self, documento_real: Documento) -> None:
         super().__init__(documento_real.nombre, documento_real.tipo, 
@@ -233,9 +218,6 @@ class ProxyDocumento(Documento):
 
 
 class GestorDocumental:
-    """
-    GestorDocumental actúa como el punto central para gestionar documentos, enlaces y carpetas.
-    """
 
     def __init__(self):
         self.raiz = Carpeta('raiz')
