@@ -1,0 +1,82 @@
+'@startuml nombre'
+
+' Clases de pizzas
+class Infantil
+class jamonyqueso
+class Barbacoa
+class cuatroQuesos
+class Personalizada
+
+' Clases de constructores de pizzas
+class ConstructorInfantil {
+    +build()
+}
+class Constructorjamonyqueso {
+    +build()
+}
+class ConstructorBarbacoa {
+    +build()
+}
+class ConstructorcuatroQuesos {
+    +build()
+}
+class ConstructorPersonalizada {
+    +build()
+}
+
+' Clase Director
+class Director {
+    +builder
+    +build()
+}
+
+' Clases para el patrón Composite
+abstract class MenuComponent {
+    #name
+    #price
+    +show()
+    +get_price()
+}
+
+class MenuItem {
+    +__str__()
+    +get_price()
+}
+
+class MenuCategory {
+    -children
+    +add()
+    +remove()
+    +show()
+}
+
+' Clase Combo
+class Combo {
+    -combo_selected
+    -total_price
+    -director
+    +start()
+    +elegir_combo()
+    +agregar_items_combo()
+    +elegir_pizzas()
+    +elegir_item()
+    +guardar_pedido_en_csv()
+    +cargar_pedidos_desde_csv()
+}
+
+' Relaciones
+Director "1" -- "1..*" ConstructorInfantil
+Director "1" -- "1..*" Constructorjamonyqueso
+Director "1" -- "1..*" ConstructorBarbacoa
+Director "1" -- "1..*" ConstructorcuatroQuesos
+Director "1" -- "1..*" ConstructorPersonalizada
+
+Combo --> Director
+Combo --> MenuCategory
+
+MenuItem -up-|> MenuComponent
+MenuCategory -up-|> MenuComponent
+
+MenuCategory "1" -- "*" MenuItem : contains
+
+@enduml
