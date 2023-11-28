@@ -407,5 +407,63 @@ class Combo:
 
             escritor_csv.writerow(datos_pedido)
 
+    def cargar_pedidos_desde_csv(self, ruta_archivo='pedidos.csv'):
+            pedidos = []
+            try:
+                with open(ruta_archivo, 'r', newline='') as archivo_csv:
+                    lector_csv = csv.DictReader(archivo_csv)
+                    for linea in lector_csv:
+                        pedido = {
+                            'fecha': linea['fecha'],
+                            'items': linea['items'].split(', '),
+                            'precio_sin_descuento': float(linea['precio_sin_descuento']),
+                            'descuento': float(linea['descuento'].rstrip('%')) / 100,
+                            'precio_final': float(linea['precio_final'])
+                        }
+                        pedidos.append(pedido)
+            except FileNotFoundError:
+                print("El archivo de pedidos no existe.")
+            except Exception as e:
+                print(f"Se produjo un error al cargar los pedidos: {e}")
+
+            return pedidos
+class MenuReconstructor:
+    def __init__(self, csv_file):
+        self.csv_file = csv_file
+
+    def reconstruir_menu(self):
+        pedidos = []
+        with open(self.csv_file, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                items = self._procesar_items(row['items'])
+                pedido = {
+                    'fecha': row['fecha'],
+                    'items': items,
+                    'precio_sin_descuento': float(row['precio_sin_descuento']),
+                    'descuento': row['descuento'],
+                    'precio_final': float(row['precio_final'])
+                }
+                pedidos.append(pedido)
+        return pedidos
+
+    def _procesar_items(self, items_str):
+        # Asumiendo que los items están separados por comas y tienen un formato específico
+        items = []
+        for item in items_str.split(', '):
+            # Procesar cada item para extraer detalles como nombre, extras, etc.
+            # Aquí deberás adaptar la lógica según el formato exacto de tus items
+            nombre, *detalles = item.split(' - ')
+            items.append({'nombre': nombre, 'detalles': detalles})
+        return items
+    
 combo = Combo()
 combo.start()
+pedidos = combo.cargar_pedidos_desde_csv()
+for pedido in pedidos:
+    print(pedido)
+
+reconstructor = MenuReconstructor('pedidos.csv')
+pedidos_reconstruidos = reconstructor.reconstruir_menu()
+for pedido in pedidos_reconstruidos:
+    print(pedido)
