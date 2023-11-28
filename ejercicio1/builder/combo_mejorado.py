@@ -82,20 +82,54 @@ class Combo:
         print("1. Combo infantil")
         print("2. Combo familiar")
         print("3. Combo pareja")
+        print('4. Sin combo')
         opcion = input("Opcion: ")
 
         if opcion == "1":
             self.combo_selected.append("Combo infantil")
             self.agregar_items_combo(1, 1, 1, 0)
+            descuento = 0.05 
         elif opcion == "2":
             self.combo_selected.append("Combo familiar")
             self.agregar_items_combo(4, 4, 4, 2)
+            descuento = 0.2
         elif opcion == "3":
             self.combo_selected.append("Combo pareja")
             self.agregar_items_combo(2, 2, 2, 1)
+            descuento = 0.1
+        elif opcion == "4":
+            self.combo_selected.append("Sin combo")
+            print("Elija los items que desee: ")
+            print("1. Pizzas")
+            print("2. Bebidas")
+            print("3. Postres")
+            print("4. Entrantes")
+            opcion = input("Opcion: ")
+            
+            if opcion == "1":
+                print("Elija el número de pizzas que desee: ")
+                num_pizzas = input("Opcion: ")
+                self.agregar_items_combo(int(num_pizzas), 0, 0, 0)
+            elif opcion == "2":
+                print("Elija el número de bebidas que desee: ")
+                num_bebidas = input("Opcion: ")
+                self.agregar_items_combo(0, int(num_bebidas), 0, 0)
+            elif opcion == "3":
+                print("Elija el número de postres que desee: ")
+                num_postres = input("Opcion: ")
+                self.agregar_items_combo(0, 0, int(num_postres), 0)
+            elif opcion == "4":
+                print("Elija el número de entrantes que desee: ")
+                num_entrantes = input("Opcion: ")
+                self.agregar_items_combo(0, 0, 0, int(num_entrantes))
         else:
             print("Opción no válida")
-
+            return
+        print(f'Precio total antes del descuento: {self.total_price:.2f}€')
+        self.total_price *= (1 - descuento)
+        print(f"Descuento aplicado: {descuento * 100}%")
+        print(f'Precio final después del descuento: {self.total_price:.2f}€')
+        
     def agregar_items_combo(self, num_pizzas, num_bebidas, num_postres, num_entrantes):
         for _ in range(num_pizzas):
             self.elegir_pizzas()
