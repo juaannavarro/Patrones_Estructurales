@@ -53,4 +53,4 @@ class Personalizada():
         self.parts.append(part)
 
     def list_parts(self) -> None:
-        print(f"Personalizada: {', '.join(self.parts)}", end="")
+        return f"Partes de la pizza: {', '.join(self.parts)}"
