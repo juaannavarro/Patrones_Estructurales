@@ -48,7 +48,7 @@ class ConstructorPersonalizada(Pizzeria):
 class Personalizada():
     def __init__(self) -> None:
         self.parts = []
-        self.base_price = 7
+        self.base_price = 9
     def add(self, part: Any) -> None:
         self.parts.append(part)
 

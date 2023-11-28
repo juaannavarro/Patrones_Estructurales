@@ -48,16 +48,17 @@ class Constructorjamonyqueso(Pizzeria):
 
 
 class jamonyqueso():
-    def __init__(self) -> None:
+    def __init__(self):
         self.parts = []
         self.base_price = 7
-    def add(self, part: Any) -> None:
+
+    def add(self, part: Any):
         self.parts.append(part)
 
-    def list_parts(self) -> None:
+    def list_parts(self):
         return f"Partes de la pizza: {', '.join(self.parts)}"
 
-    def calculate_price(self) -> None:
+    def calculate_price(self):
         extra_cost = 1  # Costo adicional por cada extra
         number_of_extras = sum("Extra:" in part for part in self.parts)
         return self.base_price + number_of_extras * extra_cost

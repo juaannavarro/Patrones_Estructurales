@@ -50,7 +50,7 @@ class ConstructorcuatroQuesos(Pizzeria):
 class cuatroQuesos():
     def __init__(self) -> None:
         self.parts = []
-        self.base_price = 7 
+        self.base_price = 8
     def add(self, part: Any) -> None:
         self.parts.append(part)
 

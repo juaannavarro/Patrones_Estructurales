@@ -55,6 +55,15 @@ postres = MenuCategory("Postres")
 postres.add(MenuItem("Helado", 2.0))
 postres.add(MenuItem("Tarta de chocolate", 2.5))
 
+extras = MenuCategory("Extras")
+extras.add(MenuItem("1.Queso extra", 1.0))
+extras.add(MenuItem("2.Borde relleno de queso", 2.0))
+extras.add(MenuItem("3.Aceitunas", 1.0))
+extras.add(MenuItem("4.Cebolla caramelizada", 1.0))
+extras.add(MenuItem("5.Maíz", 1.0))
+extras.add(MenuItem("6.Sin extras", 0.0))
+
+
 
 class Combo:
     def __init__(self):
@@ -139,29 +148,30 @@ class Combo:
             maridaje_opcion = input("Elija una opción: ")
             maridaje_seleccionado = "vino tinto" if maridaje_opcion == "1" else "cerveza"
             
-            print("\nElija los extras:")
-            print("1. Aceitunas")
-            print("2. Queso extra")
-            print("3. Sin extras")
-            extras_opcion = input("Elija una opción: ")
+            print("\nElija los extras (ingrese los números separados por comas):")
+            print(extras.show())
+
+            extras_opcion = input("Elija una opción o opciones: ")
             extras_seleccionados = []
-        
-            if extras_opcion == "1":
-                extras_seleccionados = ["Aceitunas"]
-            elif extras_opcion == "2":
-                extras_seleccionados = ["Queso extra"]
-            elif extras_opcion == "3":
-                extras_seleccionados = ["Sin extras"]
-            else:
-                print("Opción no válida")
+            precio_extras = 0
+
+            for opcion in extras_opcion.split(','):
+                opcion = opcion.strip()  # Eliminar espacios en blanco
+                if opcion.isdigit():
+                    opcion = int(opcion) - 1
+                    if 0 <= opcion < len(extras.children):
+                        extra_seleccionado = extras.children[opcion]
+                        extras_seleccionados.append(extra_seleccionado.name)
+                        precio_extras += extra_seleccionado.get_price()
+
+            # Construir la pizza con los extras seleccionados
             director.build_jamonyqueso(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)
 
             descripcion_pizza = builder.product.list_parts()
-            precio_pizza = builder.product.calculate_price()
 
-            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
-
+            precio_pizza = builder.product.calculate_price() + precio_extras
             self.total_price += precio_pizza
+            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
 
         elif opcion == "2":
             pizza_seleccionada = ["Cuatro quesos"]
@@ -193,26 +203,32 @@ class Combo:
             maridaje_opcion = input("Elija una opción: ")
             maridaje_seleccionado = "vino tinto" if maridaje_opcion == "1" else "cerveza"
         
-            print("\nElija los extras:")
-            print("1. Aceitunas")
-            print("2. Prosciutto")
-            print("3. Sin extras")
-            extras_opcion = input("Elija una opción: ")
-            extras_seleccionados = []
-        
-            if extras_opcion == "1":
-                extras_seleccionados = ["Aceitunas"]
-            elif extras_opcion == "2":
-                extras_seleccionados = ["Prosciutto"]
-            elif extras_opcion == "3": 
-                extras_seleccionados = ["Sin extras"]
-            else:
-                print("Opción no válida")
+
             
-            director.build_jamonyqueso(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)    
+            print("\nElija los extras (ingrese los números separados por comas):")
+            print(extras.show())
+
+            extras_opcion = input("Elija una opción o opciones: ")
+            extras_seleccionados = []
+            precio_extras = 0
+
+            for opcion in extras_opcion.split(','):
+                opcion = opcion.strip()  # Eliminar espacios en blanco
+                if opcion.isdigit():
+                    opcion = int(opcion) - 1
+                    if 0 <= opcion < len(extras.children):
+                        extra_seleccionado = extras.children[opcion]
+                        extras_seleccionados.append(extra_seleccionado.name)
+                        precio_extras += extra_seleccionado.get_price()
+
+            # Construir la pizza con los extras seleccionados
+            director.build_cuatroQuesos(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)
+
             descripcion_pizza = builder.product.list_parts()
-            pizza_seleccionada.append(descripcion_pizza)
-            self.combo_selected.append("Pizza: " + ", ".join(pizza_seleccionada))
+
+            precio_pizza = builder.product.calculate_price() + precio_extras
+            self.total_price += precio_pizza
+            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
         elif opcion == "3":
             pizza_seleccionada = ["Barbacoa"]
             director = Director()
@@ -243,26 +259,30 @@ class Combo:
             maridaje_opcion = input("Elija una opción: ")
             maridaje_seleccionado = "vino tinto" if maridaje_opcion == "1" else "cerveza"
         
-            print("\nElija los extras:")
-            print("1. Borde rellenos de queso")
-            print("2. Maíz")
-            print("3. Sin extras")
-            extras_opcion = input("Elija una opción: ")
+            print("\nElija los extras (ingrese los números separados por comas):")
+            print(extras.show())
+
+            extras_opcion = input("Elija una opción o opciones: ")
             extras_seleccionados = []
-        
-            if extras_opcion == "1":
-                extras_seleccionados = ["Borde rellenos de queso"]
-            elif extras_opcion == "2":
-                extras_seleccionados = ["Maíz"]
-            elif extras_opcion == "3":
-                extras_seleccionados = ["Sin extras"]
-            else:
-                print("Opción no válida")
-            
-            director.build_jamonyqueso(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)    
+            precio_extras = 0
+
+            for opcion in extras_opcion.split(','):
+                opcion = opcion.strip()  # Eliminar espacios en blanco
+                if opcion.isdigit():
+                    opcion = int(opcion) - 1
+                    if 0 <= opcion < len(extras.children):
+                        extra_seleccionado = extras.children[opcion]
+                        extras_seleccionados.append(extra_seleccionado.name)
+                        precio_extras += extra_seleccionado.get_price()
+
+            # Construir la pizza con los extras seleccionados
+            director.build_barbacoa(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)
+
             descripcion_pizza = builder.product.list_parts()
-            pizza_seleccionada.append(descripcion_pizza)
-            self.combo_selected.append("Pizza: " + ", ".join(pizza_seleccionada))
+
+            precio_pizza = builder.product.calculate_price() + precio_extras
+            self.total_price += precio_pizza
+            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
         elif opcion == "4":
                 pizza_seleccionada = ["Personalizada"]
                 director = Director()
@@ -338,31 +358,29 @@ class Combo:
                 maridaje_opcion = input("Elija una opción: ")
                 maridaje_seleccionado = "vino tinto" if maridaje_opcion == "1" else "cerveza"
                 
-                print("\nElija los extras:")
-                print("1. Cebolla caramelizada")
-                print("2. Queso extra")
-                print("3. Borde relleno de queso")
-                print("4. Aceitunas")
-                print("5. Sin extras")
-                extras_opcion = input("Elija una opción: ")
-                extras_seleccionados = []
+                print("\nElija los extras (ingrese los números separados por comas):")
+                print(extras.show())
 
-                if extras_opcion == "1":
-                    extras_seleccionados = ["Cebolla caramelizada"]
-                elif extras_opcion == "2":  
-                    extras_seleccionados = ["Queso extra"]
-                elif extras_opcion == "3":
-                    extras_seleccionados = ["Borde relleno de queso"]
-                elif extras_opcion == "4":
-                    extras_seleccionados = ["Aceitunas"]
-                elif extras_opcion == "5":
-                    extras_seleccionados = ["Sin extras"]
-                else:
-                    print("Opción no válida")
-                director.build_jamonyqueso(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)    
+                extras_opcion = input("Elija una opción o opciones: ")
+                extras_seleccionados = []
+                precio_extras = 0
+
+                for opcion in extras_opcion.split(','):
+                    opcion = opcion.strip()  # Eliminar espacios en blanco
+                    if opcion.isdigit():
+                        opcion = int(opcion) - 1
+                        if 0 <= opcion < len(extras.children):
+                            extra_seleccionado = extras.children[opcion]
+                            extras_seleccionados.append(extra_seleccionado.name)
+                            precio_extras += extra_seleccionado.get_price()
+
+                # Construir la pizza con los extras seleccionados
+                director.build_personalizada(masa_seleccionada, salsa_seleccionada, ingredientes_seleccionados, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)
                 descripcion_pizza = builder.product.list_parts()
-                pizza_seleccionada.append(descripcion_pizza)
-                self.combo_selected.append("Pizza: " + ", ".join(pizza_seleccionada))
+
+                precio_pizza = builder.product.calculate_price() + precio_extras
+                self.total_price += precio_pizza
+                self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
 
                 
         else:
