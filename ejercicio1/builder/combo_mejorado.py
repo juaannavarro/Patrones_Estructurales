@@ -150,7 +150,7 @@ class Combo:
 
             precio_pizza = builder.product.calculate_price() + precio_extras
             self.total_price += precio_pizza
-            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
+            self.combo_selected.append(f"Pizza{pizza_seleccionada}: {descripcion_pizza} - Precio: {precio_pizza}€")
 
         elif opcion == "2":
             pizza_seleccionada = ["Cuatro quesos"]
@@ -207,7 +207,7 @@ class Combo:
 
             precio_pizza = builder.product.calculate_price() + precio_extras
             self.total_price += precio_pizza
-            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
+            self.combo_selected.append(f"Pizza{pizza_seleccionada}: {descripcion_pizza} - Precio: {precio_pizza}€")
         elif opcion == "3":
             pizza_seleccionada = ["Barbacoa"]
             director = Director()
@@ -260,7 +260,7 @@ class Combo:
 
             precio_pizza = builder.product.calculate_price() + precio_extras
             self.total_price += precio_pizza
-            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
+            self.combo_selected.append(f"Pizza{pizza_seleccionada}: {descripcion_pizza} - Precio: {precio_pizza}€")
         elif opcion == "4":
                 pizza_seleccionada = ["Personalizada"]
                 director = Director()
@@ -358,9 +358,7 @@ class Combo:
 
                 precio_pizza = builder.product.calculate_price() + precio_extras
                 self.total_price += precio_pizza
-                self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
-
-                
+                self.combo_selected.append(f"Pizza{pizza_seleccionada}: {descripcion_pizza} - Precio: {precio_pizza}€")               
         else:
             print("Opcion incorrecta")
         pass
