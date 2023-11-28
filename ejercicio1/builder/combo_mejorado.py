@@ -59,14 +59,13 @@ postres.add(MenuItem("Tarta de chocolate", 2.5))
 class Combo:
     def __init__(self):
         self.combo_selected = []
-        self.director = Director()
         self.total_price = 0
+        self.director = Director()
+
+    def start(self):
         self.elegir_combo()
-        self.elegir_entrante()
-        self.elegir_pizzas()
-        self.elegir_bebida()
-        self.elegir_postre()
-        print(self.combo_selected)
+        for item in self.combo_selected:
+            print(item)
         print(f'El precio total es: {self.total_price}€')
 
     def elegir_combo(self):
@@ -75,8 +74,33 @@ class Combo:
         print("2. Combo familiar")
         print("3. Combo pareja")
         opcion = input("Opcion: ")
+
         if opcion == "1":
             self.combo_selected.append("Combo infantil")
+            self.agregar_items_combo(1, 1, 1, 0)
+        elif opcion == "2":
+            self.combo_selected.append("Combo familiar")
+            self.agregar_items_combo(4, 4, 4, 2)
+        elif opcion == "3":
+            self.combo_selected.append("Combo pareja")
+            self.agregar_items_combo(2, 2, 2, 1)
+        else:
+            print("Opción no válida")
+
+    def agregar_items_combo(self, num_pizzas, num_bebidas, num_postres, num_entrantes):
+        for _ in range(num_pizzas):
+            self.elegir_pizzas()
+        for _ in range(num_bebidas):
+            self.elegir_item(bebidas, "bebida")
+        for _ in range(num_postres):
+            self.elegir_item(postres, "postre")
+        for _ in range(num_entrantes):
+            self.elegir_item(entrantes, "entrante")
+
+
+            
+
+            
 
 
     def elegir_entrante(self):
@@ -372,5 +396,6 @@ class Combo:
         else:
             print("Por favor, ingrese un número válido")
 
-# Ejecutar el proceso
-Combo()
+
+combo = Combo()
+combo.start()
