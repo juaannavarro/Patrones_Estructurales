@@ -19,8 +19,8 @@ class ConstructorInfantil:
     def pizza(self) -> None:
         return self._product
 
-    def masa(self, tipo: str) -> None:
-        self._product.add(f"Masa {tipo}")
+    def masa(self) -> None:
+        self._product.add("Masa fina ")
 
     def salsa_base(self) -> None:
         self._product.add("Salsa: Tomate")
@@ -31,14 +31,14 @@ class ConstructorInfantil:
         self._product.add("Ingrediente: Queso")
 
 
-    def coccion(self, tipo: str) -> None:
-        self._product.add(f"Cocción: {tipo}")
+    def coccion(self) -> None:
+        self._product.add("Cocción: Horno")
 
-    def presentacion(self, tipo: str) -> None:
-        self._product.add(f"Presentación: {tipo}")
+    def presentacion(self) -> None:
+        self._product.add("Presentación: Cortada en 4")
 
-    def maridaje(self, tipo: str) -> None:
-        self._product.add(f"Maridaje: {tipo}")
+    def maridaje(self, ) -> None:
+        self._product.add("Maridaje: Aceite de oliva")
 
     def extras(self, extras: List[str]) -> None:
         for extra in extras:
