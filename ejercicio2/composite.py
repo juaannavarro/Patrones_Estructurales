@@ -5,8 +5,108 @@ import os
 import random
 import string
 
+import unittest
 
+# Aquí va la definición de tus clases (Component, Documento, etc.)
 
+class TestDocumento(unittest.TestCase):
+
+    def test_crear_documento(self):
+        doc = Documento("TestDoc", "txt", 100, "Este es el contenido")
+        self.assertEqual(doc.nombre, "TestDoc")
+        self.assertEqual(doc.tipo, "txt")
+        self.assertEqual(doc.tamaño, 100)
+        self.assertEqual(doc.contenido, "Este es el contenido")
+
+    def test_modificar_documento(self):
+        doc = Documento("TestDoc", "txt", 100, "Contenido original")
+        doc.modificar_contenido("Contenido nuevo")
+        self.assertEqual(doc.contenido, "Contenido nuevo")
+        self.assertEqual(doc.tamaño, len("Contenido nuevo"))
+        
+    def test_guardar_documento(self):
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        doc.guardar(os.path.dirname(os.path.abspath(__file__)))
+        ruta_archivo = os.path.join(os.path.dirname(os.path.abspath(__file__)), doc.nombre + '.' + doc.tipo)
+        self.assertTrue(os.path.isfile(ruta_archivo))
+        with open(ruta_archivo, 'r') as file:
+            contenido_archivo = file.read()
+        self.assertEqual(contenido_archivo, doc.contenido)
+        os.remove(ruta_archivo)
+        
+    def test_crear_enlace(self):
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        enlace = Enlace(doc)
+        self.assertEqual(enlace.referencia, doc)
+    
+    def test_crear_carpeta(self):
+        carpeta = Carpeta("TestCarpeta")
+        self.assertEqual(carpeta.nombre, "TestCarpeta")
+        self.assertEqual(carpeta._children, [])
+        
+    def test_añadir_componente(self):
+        carpeta = Carpeta("TestCarpeta")
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        carpeta.add(doc)
+        self.assertEqual(carpeta._children, [doc])
+        self.assertEqual(doc.parent, carpeta)
+        
+    def test_remover_componente(self):
+        carpeta = Carpeta("TestCarpeta")
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        carpeta.add(doc)
+        carpeta.remove(doc)
+        self.assertEqual(carpeta._children, [])
+        self.assertIsNone(doc.parent)
+        
+    def test_es_composite(self):
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        self.assertFalse(doc.is_composite())
+        carpeta = Carpeta("TestCarpeta")
+        self.assertTrue(carpeta.is_composite())
+        
+    def test_mostrar_estructura(self):
+        carpeta = Carpeta("TestCarpeta")
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        carpeta.add(doc)
+        self.assertEqual(carpeta.operation(), "Carpeta(Documento(TestDoc, txt))")
+    
+    def test_proxy_documento(self):
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        proxy = ProxyDocumento(doc)
+        self.assertEqual(proxy.nombre, "TestDoc")
+        self.assertEqual(proxy.tipo, "txt")
+        self.assertEqual(proxy.tamaño, 100)
+        self.assertEqual(proxy.contenido, "Contenido")
+        self.assertEqual(proxy._documento_real, doc)
+    
+    def test_proxy_documento_request(self):
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        proxy = ProxyDocumento(doc)
+        usuario = Usuario("TestUser", True)
+        proxy.request(usuario)
+        self.assertEqual(proxy.nombre, "TestDoc")
+        self.assertEqual(proxy.tipo, "txt")
+        self.assertEqual(proxy.tamaño, 100)
+        self.assertEqual(proxy.contenido, "Contenido")
+        self.assertEqual(proxy._documento_real, doc)
+    
+    def test_proxy_documento_request_denegado(self):
+        doc = Documento("TestDoc", "txt", 100, "Contenido")
+        proxy = ProxyDocumento(doc)
+        usuario = Usuario("TestUser", False)
+        proxy.request(usuario)
+        self.assertEqual(proxy.nombre, "TestDoc")
+        self.assertEqual(proxy.tipo, "txt")
+        self.assertEqual(proxy.tamaño, 100)
+        self.assertEqual(proxy.contenido, "Contenido")
+        self.assertEqual(proxy._documento_real, doc)
+    
+    def test_gestor_documental(self):
+        gestor = GestorDocumental()
+        self.assertEqual(gestor.raiz.nombre, "raiz")
+        self.assertEqual(gestor.raiz._children, [])
+        
 class Component(ABC):
     """
     La clase base Component declara operaciones comunes tanto para objetos
@@ -240,85 +340,5 @@ def generar_contenido_aleatorio(palabras=50):
     palabras = [generar_nombre_aleatorio(random.randint(4, 10)) for _ in range(palabras)]
     return ' '.join(palabras)
 
-def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
-
-    gestor= GestorDocumental()
-    
-    while True:
-        print("\nGestor Documental")
-        print("1. Crear documento aleatorio")
-        if usuario_actual.es_admin:
-            print("2. Crear documento secreto aleatorio")
-        print("3. Crear documento")
-        print("4. Crear carpeta")
-        print("5. Mostrar estructura")
-        print(f"6. Cambiar usuario (actualmente: {'Admin' if usuario_actual.es_admin else 'User'})")
-        print("7. Salir")
-        print("8. Modificar documento")
-        print("9. Eliminar documento o carpeta")
-        opcion = input("Seleccione una opción: ")
-
-        if opcion == '1':
-            nombre = generar_nombre_aleatorio(10)
-            tipo = generar_tipo_aleatorio()
-            contenido = generar_contenido_aleatorio()
-            documento = Documento(nombre, tipo, len(contenido), contenido)
-            carpeta_global = Carpeta("Global")
-            gestor.añadir_componente(documento, carpeta_global)
-            gestor.añadir_componente(carpeta_global)
-            print(f"Documento {nombre}.{tipo} creado.")           
-        elif opcion == '2' and usuario_actual.es_admin:
-            nombre = generar_nombre_aleatorio(10)
-            tipo = generar_tipo_aleatorio()
-            contenido = generar_contenido_aleatorio()
-            documento = ProxyDocumento(Documento(nombre, tipo, len(contenido), contenido))
-            carpeta_personal = Carpeta("Personal")
-            gestor.añadir_componente(documento, carpeta_personal)
-            gestor.añadir_componente(carpeta_personal)
-            print(f"Documento secreto {nombre}.{tipo} creado.")           
-        elif opcion == '3':           
-            nombre = input("Ingrese el nombre del documento: ")
-            tipo = input("Ingrese el tipo del documento: ")
-            tamaño = input("Ingrese el tamaño del documento: ")
-            contenido = input("Ingrese el contenido del documento: ")
-            private = input("¿Es privado? (s/n): ")
-            if private == 's':
-                Documento_secreto = ProxyDocumento(Documento(nombre, tipo, tamaño, contenido))
-                carpeta_personal = Carpeta("Personal")
-                gestor.añadir_componente(Documento_secreto, carpeta_personal)
-                gestor.añadir_componente(carpeta_personal)
-            else:               
-                Documento_simple = Documento(nombre, tipo, tamaño, contenido)
-            carpeta_global = Carpeta("Global")
-            gestor.añadir_componente(Documento_simple, carpeta_global)
-            gestor.añadir_componente(carpeta_global)
-            print(f"Documento {nombre}.{tipo} creado.")
-        elif opcion == '4':
-            nombre_carpeta = input("Ingrese el nombre de la carpeta: ")
-            carpeta = Carpeta(nombre_carpeta)
-            gestor.añadir_componente(carpeta)
-            print(f"Carpeta '{nombre_carpeta}' creada.")
-        elif opcion == '5':
-            gestor.mostrar_estructura()
-        elif opcion == '6':
-            usuario_actual.es_admin = not usuario_actual.es_admin
-            print("Cambiado a usuario administrador." if usuario_actual.es_admin else "Cambiado a usuario normal.")
-        elif opcion == '7':
-            break       
-        elif opcion == '8':
-            nombre_documento = input("Ingrese el nombre del documento a modificar: ")
-            nuevo_contenido = input("Ingrese el nuevo contenido del documento: ")
-            gestor.modificar_documento(nombre_documento, nuevo_contenido)
-
-        elif opcion == '9':
-            nombre_componente = input("Ingrese el nombre del documento o carpeta a eliminar: ")
-            gestor.eliminar_componente(nombre_componente)    
-        else:
-            print("Opción no válida, intente nuevamente.")
-
-        gestor.guardar_todos('ejercicio2')
-
-    
-
-    
-    
+if __name__ == '__main__':
+    unittest.main()
