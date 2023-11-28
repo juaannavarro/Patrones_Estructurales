@@ -1,5 +1,6 @@
 # Patrones_Estructurales
 
+mi dirección es: https://github.com/juaannavarro/Patrones_Estructurales
 
 ## Ejercicio 1
 
