@@ -3,48 +3,7 @@ from composite import *
 import unittest
 
 
-class TestDocumento(unittest.TestCase):
 
-    def setUp(self):
-        self.doc = Documento("TestDoc", "txt", 100, "Este es el contenido")
-
-    def test_documento_creation(self):
-        self.assertEqual(self.doc.nombre, "TestDoc")
-        self.assertEqual(self.doc.tipo, "txt")
-        self.assertEqual(self.doc.tamaño, 100)
-        self.assertEqual(self.doc.contenido, "Este es el contenido")
-
-    def test_modificar_documento(self):
-        self.doc.modificar_contenido("Contenido modificado")
-        self.assertEqual(self.doc.contenido, "Contenido modificado")
-        self.assertEqual(self.doc.tamaño, len("Contenido modificado"))
-
-class TestCarpeta(unittest.TestCase):
-
-    def setUp(self):
-        self.carpeta = Carpeta("CarpetaTest")
-        self.doc1 = Documento("Doc1", "txt", 100, "Contenido 1")
-        self.doc2 = Documento("Doc2", "txt", 200, "Contenido 2")
-
-    def test_añadir_documento(self):
-        self.carpeta.add(self.doc1)
-        self.assertIn(self.doc1, self.carpeta._children)
-
-    def test_eliminar_documento(self):
-        self.carpeta.add(self.doc1)
-        self.carpeta.remove(self.doc1)
-        self.assertNotIn(self.doc1, self.carpeta._children)
-
-class TestGestorDocumental(unittest.TestCase):
-
-    def setUp(self):
-        self.gestor = GestorDocumental()
-        self.doc = Documento("TestDoc", "txt", 100, "Contenido del doc")
-        self.carpeta = Carpeta("CarpetaTest")
-
-    def test_añadir_documento_a_gestor(self):
-        self.gestor.añadir_componente(self.doc, self.carpeta)
-        self.assertIn(self.doc, self.carpeta._children)
 
 
 
@@ -128,7 +87,48 @@ def menu_principal(gestor, usuario_actual=Usuario("Admin", True)):
 
         gestor.guardar_todos('ejercicio2')
 
-    
+class TestDocumento(unittest.TestCase):
+
+    def setUp(self):
+        self.doc = Documento("TestDoc", "txt", 100, "Este es el contenido")
+
+    def test_documento_creation(self):
+        self.assertEqual(self.doc.nombre, "TestDoc")
+        self.assertEqual(self.doc.tipo, "txt")
+        self.assertEqual(self.doc.tamaño, 100)
+        self.assertEqual(self.doc.contenido, "Este es el contenido")
+
+    def test_modificar_documento(self):
+        self.doc.modificar_contenido("Contenido modificado")
+        self.assertEqual(self.doc.contenido, "Contenido modificado")
+        self.assertEqual(self.doc.tamaño, len("Contenido modificado"))
+
+class TestCarpeta(unittest.TestCase):
+
+    def setUp(self):
+        self.carpeta = Carpeta("CarpetaTest")
+        self.doc1 = Documento("Doc1", "txt", 100, "Contenido 1")
+        self.doc2 = Documento("Doc2", "txt", 200, "Contenido 2")
+
+    def test_añadir_documento(self):
+        self.carpeta.add(self.doc1)
+        self.assertIn(self.doc1, self.carpeta._children)
+
+    def test_eliminar_documento(self):
+        self.carpeta.add(self.doc1)
+        self.carpeta.remove(self.doc1)
+        self.assertNotIn(self.doc1, self.carpeta._children)
+
+class TestGestorDocumental(unittest.TestCase):
+
+    def setUp(self):
+        self.gestor = GestorDocumental()
+        self.doc = Documento("TestDoc", "txt", 100, "Contenido del doc")
+        self.carpeta = Carpeta("CarpetaTest")
+
+    def test_añadir_documento_a_gestor(self):
+        self.gestor.añadir_componente(self.doc, self.carpeta)
+        self.assertIn(self.doc, self.carpeta._children)
 
     
 if __name__ == '__main__':

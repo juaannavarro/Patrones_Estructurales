@@ -7,6 +7,10 @@ from pizzas.personalizada import ConstructorPersonalizada, Personalizada
 from composite import *
 import csv
 from datetime import datetime
+
+import unittest
+from unittest.mock import patch
+
 class Combo:
     def __init__(self):
         self.combo_selected = []
@@ -457,13 +461,128 @@ class MenuReconstructor:
             items.append({'nombre': nombre, 'detalles': detalles})
         return items
     
-combo = Combo()
-combo.start()
-pedidos = combo.cargar_pedidos_desde_csv()
-for pedido in pedidos:
-    print(pedido)
 
-reconstructor = MenuReconstructor('pedidos.csv')
-pedidos_reconstruidos = reconstructor.reconstruir_menu()
-for pedido in pedidos_reconstruidos:
-    print(pedido)
+    
+class TestCombo(unittest.TestCase):
+
+    def setUp(self):
+        self.combo = Combo()
+
+    def test_elegir_combo(self):
+        with patch('builtins.input', side_effect=['1', '1', '1', '1', '1', '1', '1', '1', '1', '1']):
+            self.combo.elegir_combo()
+            self.assertEqual(self.combo.total_price, 12.0)
+
+        with patch('builtins.input', side_effect=['2', '1', '1', '1', '1', '1', '1', '1', '1', '1']):
+            self.combo.elegir_combo()
+            self.assertEqual(self.combo.total_price, 16.0)
+
+        with patch('builtins.input', side_effect=['3', '1', '1', '1', '1', '1', '1', '1', '1', '1']):
+            self.combo.elegir_combo()
+            self.assertEqual(self.combo.total_price, 14.4)
+
+        with patch('builtins.input', side_effect=['4', '1', '1', '1', '1', '1', '1', '1', '1', '1']):
+            self.combo.elegir_combo()
+            self.assertEqual(self.combo.total_price, 12.0)
+
+    def test_elegir_pizza(self):
+        with patch('builtins.input', side_effect=['1', '1', '1', '1', '1', '1', '1', '1', '1', '1']):
+            self.combo.elegir_pizzas()
+            self.assertEqual(self.combo.total_price, 12.0)
+
+        with patch('builtins.input', side_effect=['2', '1', '1', '1', '1', '1', '1', '1', '1', '1']):
+            self.combo.elegir_pizzas()
+            self.assertEqual(self.combo.total_price, 12.0)
+
+        with patch('builtins.input', side_effect=['3', '1', '1', '1', '1', '1', '1', '1', '1', '1']):
+            self.combo.elegir_pizzas()
+            self.assertEqual(self.combo.total_price, 12.0)
+
+        with patch('builtins.input', side_effect=['4', '1', '1', '1', '1',]):
+            self.combo.elegir_pizzas()
+            self.assertEqual(self.combo.total_price, 12.0)
+            
+    def test_elegir_bebida(self):
+        with patch('builtins.input', side_effect=['1', '1']):
+            self.combo.elegir_bebida()
+            self.assertEqual(self.combo.total_price, 1.5)
+
+        with patch('builtins.input', side_effect=['2', '1']):
+            self.combo.elegir_bebida()
+            self.assertEqual(self.combo.total_price, 1.5)
+    
+    def test_elegir_postre(self):
+        with patch('builtins.input', side_effect=['1', '1']):
+            self.combo.elegir_postre()
+            self.assertEqual(self.combo.total_price, 2.0)
+
+        with patch('builtins.input', side_effect=['2', '1']):
+            self.combo.elegir_postre()
+            self.assertEqual(self.combo.total_price, 2.5)
+            
+    def test_elegir_entrante(self):
+        with patch('builtins.input', side_effect=['1', '1']):
+            self.combo.elegir_entrante()
+            self.assertEqual(self.combo.total_price, 2.5)
+
+        with patch('builtins.input', side_effect=['2', '1']):
+            self.combo.elegir_entrante()
+            self.assertEqual(self.combo.total_price, 3.0)
+    
+    def test_elegir_item(self):
+        with patch('builtins.input', side_effect=['1']):
+            self.combo.elegir_item(bebidas, "bebida")
+            self.assertEqual(self.combo.total_price, 1.5)
+
+        with patch('builtins.input', side_effect=['2']):
+            self.combo.elegir_item(postres, "postre")
+            self.assertEqual(self.combo.total_price, 2.5)
+            
+        with patch('builtins.input', side_effect=['1']):
+            self.combo.elegir_item(entrantes, "entrante")
+            self.assertEqual(self.combo.total_price, 2.5)
+            
+    def test_guardar_pedido_en_csv(self):
+        self.combo.combo_selected = ['Pizza Jamón y Queso - Masa: gruesa, Cocción: horno, Presentación: caja, Maridaje: vino tinto, Extras: Queso, Cebolla', 'Bebida: Coca-cola', 'Postre: Helado']
+        self.combo.total_price = 12.0
+        self.combo.guardar_pedido_en_csv(12.0, 0)
+        pedidos = self.combo.cargar_pedidos_desde_csv()
+        self.assertEqual(len(pedidos), 1)
+        self.assertEqual(pedidos[0]['items'], ['Pizza Jamón y Queso - Masa: gruesa, Cocción: horno, Presentación: caja, Maridaje: vino tinto, Extras: Queso, Cebolla', 'Bebida: Coca-cola', 'Postre: Helado'])
+        self.assertEqual(pedidos[0]['precio_sin_descuento'], 12.0)
+        self.assertEqual(pedidos[0]['descuento'], 0)
+        self.assertEqual(pedidos[0]['precio_final'], 12.0)
+        
+    def test_cargar_pedidos_desde_csv(self):
+        self.combo.combo_selected = ['Pizza Jamón y Queso - Masa: gruesa, Cocción: horno, Presentación: caja, Maridaje: vino tinto, Extras: Queso, Cebolla', 'Bebida: Coca-cola', 'Postre: Helado']
+        self.combo.total_price = 12.0
+        self.combo.guardar_pedido_en_csv(12.0, 0)
+        pedidos = self.combo.cargar_pedidos_desde_csv()
+        self.assertEqual(len(pedidos), 1)
+        self.assertEqual(pedidos[0]['items'], ['Pizza Jamón y Queso - Masa: gruesa, Cocción: horno, Presentación: caja, Maridaje: vino tinto, Extras: Queso, Cebolla', 'Bebida: Coca-cola', 'Postre: Helado'])
+        self.assertEqual(pedidos[0]['precio_sin_descuento'], 12.0)
+        self.assertEqual(pedidos[0]['descuento'], 0)
+        self.assertEqual(pedidos[0]['precio_final'], 12.0)
+        
+    def test_reconstruir_menu(self):
+        self.combo.combo_selected = ['Pizza Jamón y Queso - Masa: gruesa, Cocción: horno, Presentación: caja, Maridaje: vino tinto, Extras: Queso, Cebolla', 'Bebida: Coca-cola', 'Postre: Helado']
+        self.combo.total_price = 12.0
+        self.combo.guardar_pedido_en_csv(12.0, 0)
+        reconstructor = MenuReconstructor('pedidos.csv')
+        pedidos_reconstruidos = reconstructor.reconstruir_menu()
+        self.assertEqual(len(pedidos_reconstruidos), 1)
+        self.assertEqual(pedidos_reconstruidos[0]['items'], [{'nombre': 'Pizza Jamón y Queso', 'detalles': ['Masa: gruesa', 'Cocción: horno', 'Presentación: caja', 'Maridaje: vino tinto', 'Extras: Queso, Cebolla']}, {'nombre': 'Bebida', 'detalles': ['Coca-cola']}, {'nombre': 'Postre', 'detalles': ['Helado']}])
+        self.assertEqual(pedidos_reconstruidos[0]['precio_sin_descuento'], 12.0)
+        self.assertEqual(pedidos_reconstruidos[0]['descuento'], 0)
+        self.assertEqual(pedidos_reconstruidos[0]['precio_final'], 12.0)
+        
+    def test_procesar_items(self):
+        reconstructor = MenuReconstructor('pedidos.csv')
+        items = reconstructor._procesar_items('Pizza Jamón y Queso - Masa: gruesa, Cocción: horno, Presentación: caja, Maridaje: vino tinto, Extras: Queso, Cebolla, Bebida: Coca-cola, Postre: Helado')
+        self.assertEqual(items, [{'nombre': 'Pizza Jamón y Queso', 'detalles': ['Masa: gruesa', 'Cocción: horno', 'Presentación: caja', 'Maridaje: vino tinto', 'Extras: Queso, Cebolla']}, {'nombre': 'Bebida', 'detalles': ['Coca-cola']}, {'nombre': 'Postre', 'detalles': ['Helado']}])
+    
+    
+
+# Ejecutar las pruebas
+if __name__ == '__main__':
+    unittest.main()
