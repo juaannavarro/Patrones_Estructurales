@@ -97,12 +97,6 @@ class Combo:
         for _ in range(num_entrantes):
             self.elegir_item(entrantes, "entrante")
 
-
-            
-
-            
-
-
     def elegir_entrante(self):
         self.elegir_item(entrantes, "entrante")
         pass
@@ -160,11 +154,14 @@ class Combo:
                 extras_seleccionados = ["Sin extras"]
             else:
                 print("Opción no válida")
-                
-            director.build_jamonyqueso(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)    
+            director.build_jamonyqueso(masa_seleccionada, coccion_seleccionada, presentacion_seleccionada, maridaje_seleccionado, extras_seleccionados)
+
             descripcion_pizza = builder.product.list_parts()
-            pizza_seleccionada.append(descripcion_pizza)
-            self.combo_selected.append("Pizza: " + ", ".join(pizza_seleccionada))
+            precio_pizza = builder.product.calculate_price()
+
+            self.combo_selected.append(f"Pizza: {descripcion_pizza} - Precio: {precio_pizza}€")
+
+            self.total_price += precio_pizza
 
         elif opcion == "2":
             pizza_seleccionada = ["Cuatro quesos"]

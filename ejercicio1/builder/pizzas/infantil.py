@@ -47,9 +47,14 @@ class ConstructorInfantil:
 class infantil():
     def __init__(self) -> None:
         self.parts = []
-
+        self.base_price = 5
     def add(self, part: Any) -> None:
         self.parts.append(part)
 
     def list_parts(self) -> None:
         return f"Partes de la pizza: {', '.join(self.parts)}"
+
+    def calculate_price(self) -> None:
+        extra_cost = 1  # Costo adicional por cada extra
+        number_of_extras = sum("Extra:" in part for part in self.parts)
+        return self.base_price + number_of_extras * extra_cost
